@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -29,6 +29,12 @@ export default function KanbanBoard({ initialTasks }: Props) {
   const [showCreate, setShowCreate] = useState(false);
   const [, startTransition] = useTransition();
   const router = useRouter();
+
+  // Sync local state when the server re-renders (after revalidatePath or router.refresh)
+  // useState(initialTasks) only runs once — useEffect bridges prop updates into state
+  useEffect(() => {
+    setTasks(initialTasks);
+  }, [initialTasks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })

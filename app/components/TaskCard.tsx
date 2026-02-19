@@ -54,7 +54,7 @@ export default function TaskCard({ task, isDragging }: Props) {
           >
             ⠿
           </div>
-          <h3 className="flex-1 text-sm font-medium text-gray-800 leading-snug">
+          <h3 className="flex-1 text-sm font-semibold text-gray-800 leading-snug">
             {task.title}
           </h3>
           <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
