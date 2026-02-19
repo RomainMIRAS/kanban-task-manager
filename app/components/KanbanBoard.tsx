@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -11,7 +11,7 @@ import {
   useSensors,
   closestCenter,
 } from "@dnd-kit/core";
-import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { moveTask } from "@/app/actions";
 import { Task, Status, COLUMNS } from "@/lib/types";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ export default function KanbanBoard({ initialTasks }: Props) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [, startTransition] = useTransition();
+  const router = useRouter();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -56,7 +57,9 @@ export default function KanbanBoard({ initialTasks }: Props) {
     const task = tasks.find((t) => t.id === taskId);
     if (!task || !newStatus || task.status === newStatus) return;
 
-    // Optimistic update
+    // Snapshot avant l'optimistic update pour rollback fiable
+    const snapshot = tasks;
+
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
     );
@@ -65,7 +68,7 @@ export default function KanbanBoard({ initialTasks }: Props) {
       const result = await moveTask(taskId, newStatus);
       if (!result?.success) {
         toast.error("Erreur lors du déplacement");
-        setTasks(initialTasks);
+        setTasks(snapshot); // rollback sur l'état courant, pas la prop initiale
       }
     });
   }
@@ -110,7 +113,6 @@ export default function KanbanBoard({ initialTasks }: Props) {
                   key={col.id}
                   column={col}
                   tasks={tasksByStatus(col.id)}
-                  onTasksChange={setTasks}
                 />
               ))}
             </div>
@@ -131,9 +133,7 @@ export default function KanbanBoard({ initialTasks }: Props) {
         <TaskModal
           onClose={() => {
             setShowCreate(false);
-            // Refresh via server revalidation, tasks will update on next navigation
-            // For instant update we rely on revalidatePath
-            window.location.reload();
+            router.refresh();
           }}
         />
       )}

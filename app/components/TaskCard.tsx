@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Task, PRIORITY_CONFIG } from "@/lib/types";
@@ -10,10 +11,10 @@ import DeleteDialog from "./DeleteDialog";
 interface Props {
   task: Task;
   isDragging?: boolean;
-  onTasksChange?: (updater: (prev: Task[]) => Task[]) => void;
 }
 
-export default function TaskCard({ task, isDragging, onTasksChange }: Props) {
+export default function TaskCard({ task, isDragging }: Props) {
+  const router = useRouter();
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
@@ -30,7 +31,7 @@ export default function TaskCard({ task, isDragging, onTasksChange }: Props) {
   function handleClose() {
     setShowEdit(false);
     setShowDelete(false);
-    window.location.reload();
+    router.refresh();
   }
 
   return (

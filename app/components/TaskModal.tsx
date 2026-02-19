@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useTransition } from "react";
+import { useTransition } from "react";
 import { createTask, updateTask } from "@/app/actions";
 import { Task } from "@/lib/types";
 import { toast } from "sonner";
@@ -11,7 +11,6 @@ interface Props {
 }
 
 export default function TaskModal({ task, onClose }: Props) {
-  const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
   const isEdit = !!task;
 
@@ -39,7 +38,7 @@ export default function TaskModal({ task, onClose }: Props) {
         <h2 className="mb-5 text-xl font-semibold">
           {isEdit ? "Modifier la tâche" : "Nouvelle tâche"}
         </h2>
-        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
               Titre <span className="text-red-500">*</span>

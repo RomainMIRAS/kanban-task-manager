@@ -14,10 +14,9 @@ const COLUMN_STYLES: Record<Status, { header: string; dot: string }> = {
 interface Props {
   column: { id: Status; label: string };
   tasks: Task[];
-  onTasksChange: (updater: (prev: Task[]) => Task[]) => void;
 }
 
-export default function KanbanColumn({ column, tasks, onTasksChange }: Props) {
+export default function KanbanColumn({ column, tasks }: Props) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
   const style = COLUMN_STYLES[column.id];
 
@@ -41,7 +40,7 @@ export default function KanbanColumn({ column, tasks, onTasksChange }: Props) {
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div className="flex min-h-[120px] flex-col gap-3 p-3">
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onTasksChange={onTasksChange} />
+            <TaskCard key={task.id} task={task} />
           ))}
           {tasks.length === 0 && (
             <p className="flex flex-1 items-center justify-center text-sm text-gray-400">
